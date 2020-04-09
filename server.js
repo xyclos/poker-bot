@@ -76,7 +76,7 @@ app.prepare()
             if (chat.jiraTicket) {
                 return {
                     user: POKER_BOT,
-                    message: `Now sizing ticket ${chat.jiraTicket}. Enter your points. Enter 'reveal', 'end' or 'show' to calculate results`
+                    message: `Now sizing ticket ${chat.jiraTicket}. Enter your points. When you're done, enter 'reveal', 'end' or 'show' to calculate results`
                 }
             }
             if (chat.message && revealQueues.includes(chat.message.trim())) {

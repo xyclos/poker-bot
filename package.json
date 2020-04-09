@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node server.js",
     "build": "next build",
-    "start": "NODE_ENV=production node server.js"
+    "start": "NODE_ENV=production node server.js",
+    "postinstall": "bundle-deps ."
   },
   "keywords": [],
   "author": "Jake Johnson",
@@ -22,5 +23,20 @@
     "pusher-js": "^5.1.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
+  },
+  "bundledDependencies": [
+    "axios",
+    "body-parser",
+    "cors",
+    "dotenv",
+    "express",
+    "next",
+    "pusher",
+    "pusher-js",
+    "react",
+    "react-dom"
+  ],
+  "devDependencies": {
+    "bundle-deps": "^1.0.0"
   }
 }

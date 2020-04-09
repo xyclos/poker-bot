@@ -1,0 +1,7 @@
+language: node
+node_js:
+  - "12.7.0"
+jobs:
+  fast_finish: true
+script:
+  - npm run build

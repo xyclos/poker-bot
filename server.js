@@ -55,7 +55,7 @@ app.prepare()
             return handler(req, res)
         })
 
-        const chatHistory = { messages: [] };
+        const chatHistory = { messages: [] }
         let pokerState = {
             ticket: '',
             votes: {}
@@ -77,7 +77,8 @@ app.prepare()
             if (chat.jiraTicket) {
                 return {
                     user: POKER_BOT,
-                    message: `Now sizing ticket ${chat.jiraTicket}. Enter your points. When you're done, enter 'reveal', 'end' or 'show' to calculate results`
+                    message: `Now sizing ticket ${chat.jiraTicket}. Enter your points. When you're done, enter 'reveal', 'end' or 'show' to calculate results`,
+                    room: chat.room
                 }
             }
             if (chat.message && revealQueues.includes(chat.message.trim())) {
@@ -86,38 +87,42 @@ app.prepare()
                 const votesString = Object.keys(pokerState.votes).map(k => `${k} voted ${pokerState.votes[k]}`).join('\n')
                 return {
                     user: POKER_BOT,
-                    message: `The results are in!\n${votesString}\naverage score: ${avg}`
+                    message: `The results are in!\n${votesString}\naverage score: ${avg}`,
+                    room: chat.room
                 }
             }
         }
 
         server.post('/message', (req, res) => {
-            const { user = '', message = '', timestamp = +new Date } = req.body;
+            const { user = '', message = '', timestamp = +new Date } = req.body
+            const { r: room } = req.query
 
             const jiraTicket = getJiraTicket(message)
             const points = parsePoints(message)
 
-            const chat = { user, message, timestamp, jiraTicket, points };
-            updatePokerState(chat);
+            const chat = { user, message, timestamp, jiraTicket, points, room }
+            updatePokerState(chat)
 
-            const botChat = pokerBotResponse(chat);
-            chatHistory.messages.push(chat);
+            const botChat = pokerBotResponse(chat)
+            chatHistory.messages.push(chat)
 
-            pusher.trigger('chat-room', 'new-message', { chat });
+            pusher.trigger(`chat-room-${room}`, 'new-message', { chat })
 
             if (botChat) {
                 setTimeout(() => {
                     chatHistory.messages.push(botChat)
-                    pusher.trigger('chat-room', 'new-message', { chat: { ...botChat, timestamp: +new Date } });
+                    pusher.trigger(`chat-room-${room}`, 'new-message', { chat: { ...botChat, timestamp: +new Date } })
                 }, 500)
             }
 
             res.end()
-        });
+        })
 
         server.post('/messages', (req, res) => {
-            res.json({ ...chatHistory, status: 'success' });
-        });
+            const { r: room } = req.query
+            console.log('!!! room', room)
+            res.json({ messages: chatHistory.messages.filter(m => m.room === room), status: 'success' })
+        })
 
         server.listen(port, err => {
             if (err) throw err

@@ -1,9 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import Layout from '../components/Layout'
 import Chat from '../components/Chat'
+import Router from 'next/router'
 
-const IndexPage = () => {
+const generateUID = () => {
+    let firstPart = (Math.random() * 46656) | 0
+    let secondPart = (Math.random() * 46656) | 0
+    firstPart = ("000" + firstPart.toString(36)).slice(-3)
+    secondPart = ("000" + secondPart.toString(36)).slice(-3)
+    return firstPart + secondPart
+}
+
+const IndexPage = ({ room }) => {
     const [state, setState] = useState({ user: null })
+    useEffect(() => {
+        if (!room) {
+            Router.push(`/?r=${generateUID()}`)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
     const handleKeyUp = evt => {
         if (evt.keyCode === 13) {
             const user = evt.target.value
@@ -42,7 +58,7 @@ const IndexPage = () => {
                     </section>
                     <section
                         className="col-md-6 position-relative d-flex flex-wrap h-100 align-items-start align-content-between bg-white px-0">
-                        {user && <Chat activeUser={user}/>}
+                        {user && <Chat room={room} activeUser={user} />}
                     </section>
                 </div>
             </main>
@@ -50,8 +66,18 @@ const IndexPage = () => {
     )
 }
 
-export default function App () {
+IndexPage.propTypes = {
+    room: PropTypes.string
+}
+
+export const getServerSideProps = async ({ query }) => {
+    return {
+        props: { room: query.r || '' }
+    }
+}
+
+export default function App (props) {
     return (
-        <IndexPage/>
+        <IndexPage {...props}/>
     )
 }

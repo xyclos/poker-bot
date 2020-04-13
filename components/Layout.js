@@ -1,5 +1,6 @@
-import React, { Fragment } from 'react';
-import Head from 'next/head';
+import React, { Fragment } from 'react'
+import PropTypes from 'prop-types'
+import Head from 'next/head'
 
 const Layout = props => (
     <Fragment>
@@ -11,6 +12,11 @@ const Layout = props => (
         </Head>
         {props.children}
     </Fragment>
-);
+)
 
-export default Layout;
+Layout.propTypes = {
+    pageTitle: PropTypes.string,
+    children: PropTypes.node
+}
+
+export default Layout

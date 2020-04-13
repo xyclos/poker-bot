@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node server.js",
     "build": "next build",
+    "lint": "eslint --ignore-path .gitignore .",
     "start": "NODE_ENV=production node server.js",
     "postinstall": "bundle-deps ."
   },
@@ -19,6 +20,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "next": "^9.3.4",
+    "prop-types": "^15.7.2",
     "pusher": "^3.0.1",
     "pusher-js": "^5.1.1",
     "react": "^16.13.1",
@@ -37,6 +39,9 @@
     "react-dom"
   ],
   "devDependencies": {
-    "bundle-deps": "^1.0.0"
+    "bundle-deps": "^1.0.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^3.0.0"
   }
 }

@@ -50,6 +50,8 @@ const IndexPage = () => {
     )
 }
 
-export default () => (
-    <IndexPage/>
-)
+export default function App () {
+    return (
+        <IndexPage/>
+    )
+}

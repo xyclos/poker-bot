@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 const ChatMessage = props => {
     const { position = 'left', message } = props
@@ -27,6 +28,12 @@ const ChatMessage = props => {
             </div>
         </div>
     )
+}
+
+ChatMessage.propTypes = {
+    position: PropTypes.string,
+    message: PropTypes.string,
+    obscure: PropTypes.bool
 }
 
 export default ChatMessage

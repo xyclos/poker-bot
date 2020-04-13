@@ -3,7 +3,8 @@ const next = require('next')
 const Pusher = require('pusher')
 const express = require('express')
 const bodyParser = require('body-parser')
-const dotenv = require('dotenv').config()
+
+require('dotenv').config()
 
 const dev = process.env.NODE_ENV !== 'production'
 const port = process.env.PORT || 3000

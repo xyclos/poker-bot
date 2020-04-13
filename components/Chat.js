@@ -1,4 +1,5 @@
-import React, { Fragment, useState, useEffect } from 'react'
+import React, { Fragment, useState, useEffect, useRef } from 'react'
+import PropTypes from 'prop-types'
 import axios from 'axios'
 import Pusher from 'pusher-js'
 import ChatMessage from './ChatMessage'
@@ -11,19 +12,30 @@ const Chat = props => {
     })
     const channel = pusher.subscribe('chat-room')
     const [state, setState] = useState({ chats: [] })
+    const chatContainer = useRef(null)
     useEffect(() => {
+        const scrollToBottom = () => {
+            if (chatContainer.current) {
+                chatContainer.current.scrollTop = chatContainer.current.scrollHeight
+            }
+        }
         channel.bind('new-message', ({ chat = null }) => {
             const { chats } = state
             chat && chats.push(chat)
             setState({ chats })
+            scrollToBottom()
         })
 
         pusher.connection.bind('connected', () => {
-            axios.post('/messages').then(response => setState({ chats: response.data.messages }))
+            axios.post('/messages').then(response => {
+                scrollToBottom()
+                setState({ chats: response.data.messages })
+            })
         })
 
         return () => pusher.disconnect()
-    }, [state, setState, pusher, channel])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const handleKeyUp = async (evt) => {
         const value = evt.target.value
@@ -31,6 +43,10 @@ const Chat = props => {
         if (evt.keyCode === 13 && !evt.shiftKey) {
             const { activeUser: user } = props
             const chat = { user, message: value, timestamp: +new Date }
+
+            if (chatContainer.current) {
+                chatContainer.current.scrollTop = chatContainer.current.scrollHeight
+            }
 
             evt.target.value = ''
             await axios.post('/message', chat)
@@ -43,7 +59,7 @@ const Chat = props => {
             <h2 className="text-dark mb-0 mx-4 px-2">{props.activeUser}</h2>
         </div>
 
-        <div className="px-4 pb-4 w-100 d-flex flex-row flex-wrap align-items-start align-content-start position-relative" style={{ height: 'calc(100% - 180px)', overflowY: 'scroll' }}>
+        <div ref={chatContainer} className="px-4 pb-4 w-100 d-flex flex-row flex-wrap align-items-start align-content-start position-relative" style={{ height: 'calc(100% - 180px)', overflowY: 'scroll' }}>
 
             {state.chats.map((chat, index) => {
                 const previous = Math.max(0, index - 1)
@@ -70,6 +86,10 @@ const Chat = props => {
             <textarea className="form-control px-3 py-2" onKeyUp={handleKeyUp} placeholder="Enter a ticket number, some points or a chat message" style={{ resize: 'none' }} />
         </div>
     </> )
+}
+
+Chat.propTypes = {
+    activeUser: PropTypes.string
 }
 
 export default Chat
